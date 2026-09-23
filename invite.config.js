@@ -164,9 +164,9 @@ window.invitationConfig = {
     namesFrame: "assets/art/names-frame-pastel.webp",
     mantap: "assets/vishalakshi-mantap-pastel.webp",
     mantapTransparent: true, // transparent cutout: no edge feathering or tint
-    eventDivider: "assets/art/flourish-divider.webp", // gold flourish between events (cut from the RSVP art)
-    rsvp: "assets/art/rsvp.webp", // masters: assets/masters/stage-3/
-    endingFrame: "assets/art/ending-frame.webp",
+    eventDivider: "assets/art/flourish-divider-v2.webp", // gold flourish between events (cut from the RSVP art)
+    rsvp: "assets/art/rsvp-lettering.webp", // masters: assets/masters/stage-3/
+    endingFrame: "assets/art/ending-garland.webp",
   },
 
 
