@@ -299,8 +299,13 @@ main {
   margin: 0 auto;
 }
 
+/* The artwork has ~1.5% empty margin each side; enlarge slightly so the embroidery runs edge to edge. */
+.hero { overflow: hidden; }
+
 .hero__frame {
   position: relative;
+  width: 104%;
+  margin-left: -2%;
   aspect-ratio: 908 / 1733;
   container-type: inline-size;
 }
@@ -532,8 +537,8 @@ main {
   padding-top: 48px;
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 500;
-  font-size: clamp(26px, 7vw, 32px);
+  font-weight: 600;
+  font-size: clamp(34px, 9.4vw, 42px);
   color: var(--sage);
 }
 

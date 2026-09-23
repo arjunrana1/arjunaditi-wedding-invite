@@ -14,7 +14,7 @@ window.invitationConfig = {
   dates: {
     year: 2026,
     month: 11,
-    dateRangeDisplay: "24–25 November 2026",
+    dateRangeDisplay: "24 and 25 November 2026",
     timezone: "Asia/Kolkata",
     // Countdown target: Haldi, 24 November 2026, 1 PM India time.
     countdownTarget: "2026-11-24T13:00:00+05:30",
@@ -33,11 +33,11 @@ window.invitationConfig = {
     countdownDone: "The celebrations have begun",
     coverLabel: "Aditi & Arjun",
     whenWhereHeading: "When & Where",
-    mapButton: "View on Google Maps",
+    mapButton: "View Location",
     eventMapButton: "Directions",
     dressCodeLabel: "Dress code",
     closingLine: "We cannot wait to celebrate with you",
-    closingDetails: "Art of Living International Centre · 24–25 November 2026",
+    closingDetails: "Art of Living International Centre · 24 and 25 November 2026",
     settingHeading: "The Setting",
     celebrationsHeading: "Our Celebrations",
     attireHeading: "Attire",
