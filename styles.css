@@ -8,6 +8,10 @@
   --body: #3F4A3C;
   --sage: #5F7A63;
   --gold: #9C7F3E;
+  --heading: #45604A; /* section headings: a deeper sage */
+  /* One small-label style (dates, labels, buttons, Skip): Jost 500, uppercase, tracked. */
+  --label-size: 12px;
+  --label-track: .12em;
   --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
   --font-body: Jost, "Avenir Next", "Segoe UI", system-ui, sans-serif;
 
@@ -299,13 +303,13 @@ main {
   margin: 0 auto;
 }
 
-/* The artwork has ~1.5% empty margin each side; enlarge slightly so the embroidery runs edge to edge. */
+/* The frame is drawn 15% wider than the screen so the embroidery runs edge to edge. */
 .hero { overflow: hidden; }
 
 .hero__frame {
   position: relative;
-  width: 104%;
-  margin-left: -2%;
+  width: 115%;
+  margin-left: -7.5%; /* centred; the outer vines spill past the screen edges */
   aspect-ratio: 908 / 1733;
   container-type: inline-size;
 }
@@ -717,10 +721,10 @@ main {
 /* ───────── RSVP ───────── */
 
 .rsvp {
-  padding: 32px 12px 8px;
+  padding: 28px 12px 0;
   text-align: center;
 }
-.rsvp__art { width: 100%; height: auto; }
+.rsvp__art { width: 90%; height: auto; margin: 0 auto; }
 .rsvp__note {
   margin: 4px 24px 0;
   font-size: 16px;
@@ -730,10 +734,13 @@ main {
 /* ───────── Closing ─────────
    Live text sits inside the frame's open centre (≈ 22–78% × 16–76% of the artwork). */
 
-.ending { padding: 40px 0 56px; }
+.ending { padding: 0 0 56px; overflow: hidden; }
 
+/* 20% wider than the screen, centred; the frame's outer edges spill off-screen. */
 .ending__frame {
   position: relative;
+  width: 120%;
+  margin-left: -10%;
   container-type: inline-size;
 }
 .ending__art { width: 100%; height: auto; }
@@ -779,6 +786,53 @@ main {
   text-transform: uppercase;
   color: var(--body);
   text-wrap: balance;
+}
+
+/* ───────── Shared type (one definition per role; overrides the per-section values above) ───────── */
+
+/* Section headings */
+.setting__heading, .events__heading {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(36px, 10vw, 44px);
+  line-height: 1.1;
+  color: var(--heading);
+}
+
+/* Place and event titles */
+.setting__centre, .event__title {
+  font-size: clamp(27px, 7.4vw, 33px);
+}
+
+/* Body text */
+.setting__note, .event__venue, .rsvp__note { font-size: 16px; }
+
+/* Italic accent lines */
+.event__subtitle, .event__attire { font-size: 17px; }
+
+/* Small uppercase labels and buttons */
+.skip, .hero__date, .countdown__heading, .countdown__label,
+.event__when, .event__attire-label, .setting__map, .event__map, .ending__details {
+  font-family: var(--font-body);
+  font-size: var(--label-size);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+}
+
+/* Buttons: same pill, and text optically centred (tracking adds space after the last letter). */
+.skip, .setting__map, .event__map {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 22px 0 calc(22px + var(--label-track));
+  border: 1px solid var(--sage);
+  border-radius: 999px;
+  line-height: 1;
+  color: var(--ink);
 }
 
 /* Reveal: only when observers exist and motion is allowed (app.js adds .reveal-ready). */
