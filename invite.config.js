@@ -34,10 +34,13 @@ window.invitationConfig = {
     coverLabel: "Aditi & Arjun",
     whenWhereHeading: "When & Where",
     mapButton: "View Location",
-    eventMapButton: "Directions",
+    eventMapButton: "View Location",
     dressCodeLabel: "Dress code",
     closingLine: "We cannot wait to celebrate with you",
-    closingDetails: "Art of Living International Centre · 24th, 25th Nov 2026",
+    closingDetails: "With the blessings of our parents",
+    scrollCue: "Scroll down",
+    musicOn: "Turn music off", // accessible names for the music button
+    musicOff: "Turn music on",
     settingHeading: "The Setting",
     celebrationsHeading: "Our Celebrations",
     attireHeading: "Attire",
@@ -50,14 +53,14 @@ window.invitationConfig = {
   },
 
   venue: {
-    centreName: "Art of Living International Centre",
+    centreName: "Art of Living International Centre, Bangalore",
     landmarkName: "Vishalakshi Mantap",
     landmarkCaption: "Vishalakshi Mantap",
     landmarkAlt: "Embroidered Vishalakshi Mantap with its dome, tiers and front stairway",
-    campusMapUrl: "", // Paste the exact venue's Google Maps link here.
+    campusMapUrl: "https://maps.app.goo.gl/HfzEFNVEVz69Ac9v7", // Vishalakshi Mantap
     // Stage 1 has no event sections yet, so this says "each event" rather than "each event below".
     explanatoryCopy:
-      "The vibrant, eco-friendly campus is a renowned spiritual hub famous for its iconic Vishalakshi Mantap, with visitors from around the world gathering here for various meditation retreats.",
+      "A place of stillness and learning, the Centre draws seekers from across the world to practise yoga and breath-work. It is also home to a Gurukul that keeps ancient Vedic traditions alive, including the sacred Vedic Vivah.",
   },
 
   // Confirmed schedule. Each entry renders one event section (title, date/time, venue, dress code, map link).
@@ -73,7 +76,7 @@ window.invitationConfig = {
       subtitle: "",
       description: "Join us for an afternoon of haldi, laughter, and blessings as the celebrations begin.",
       venue: "Panchamrit Lawns",
-      mapUrl: "", // Paste the exact venue's Google Maps link here.
+      mapUrl: "https://maps.app.goo.gl/jEGDnzqhhD4Xnmoc6",
       attire: "Light pastel shades",
       programmeLabel: "Haldi",
       palette: "haldi",
@@ -89,7 +92,7 @@ window.invitationConfig = {
       subtitle: "",
       description: "An evening of music, dance, and joyful celebration with our family and friends.",
       venue: "Old Ashram Amphitheatre",
-      mapUrl: "", // Paste the exact venue's Google Maps link here.
+      mapUrl: "https://maps.app.goo.gl/ttvyPNzuitgpvrkJ9",
       attire: "Get your bling on",
       programmeLabel: "Sangeet",
       palette: "sangeet",
@@ -105,7 +108,7 @@ window.invitationConfig = {
       subtitle: "",
       description: "Join us as we begin our married life together, surrounded by your love and blessings.",
       venue: "Radha Kunj Mantap",
-      mapUrl: "", // Paste the exact venue's Google Maps link here.
+      mapUrl: "https://maps.app.goo.gl/g1T1XfCXn8VHuxcW7",
       attire: "Royal traditionals",
       programmeLabel: "Wedding Ceremony",
       palette: "wedding",
@@ -143,6 +146,7 @@ window.invitationConfig = {
     },
     // Fonts are loaded from Google Fonts in index.html; fallbacks keep the page usable offline.
     fonts: {
+      names: "'Fraunces', 'Cormorant Garamond', Georgia, serif", // soft, rounded serif for the couple's names
       display: "'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif",
       body: "Jost, 'Avenir Next', 'Segoe UI', system-ui, sans-serif",
     },
@@ -162,11 +166,13 @@ window.invitationConfig = {
     ribbonRight: "assets/art/ribbon-right.webp", // falls to the right with the knot
     ribbonKnot: "assets/art/ribbon-knot.webp",
     namesFrame: "assets/art/names-frame-pastel.webp",
-    mantap: "assets/vishalakshi-mantap-pastel.webp",
+    mantap: "assets/art/mantap-stairs-v2.webp", // master: assets/masters/pastel-v2/vishalakshi-mantap-stairs-only.png
     mantapTransparent: true, // transparent cutout: no edge feathering or tint
     eventDivider: "assets/art/flourish-divider-v2.webp", // gold flourish between events (cut from the RSVP art)
     rsvp: "assets/art/rsvp-lettering.webp", // masters: assets/masters/stage-3/
     endingFrame: "assets/art/ending-garland.webp",
+    ganapati: "assets/art/ganapati.webp", // floats above the ribbon knot on the cover
+    music: "assets/music.m4a", // AAC 128 kbps from assets/masters/stage-3/music.mp3; "" hides the music button
   },
 
 

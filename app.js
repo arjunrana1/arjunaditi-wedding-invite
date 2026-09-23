@@ -55,6 +55,7 @@
     setSource(".setting__art", assets.mantap);
     setSource(".rsvp__art", assets.rsvp);
     setSource(".ending__art", assets.endingFrame);
+    setSource(".ganapati__img", assets.ganapati);
     document.querySelector(".setting").classList.toggle("setting--transparent-art", Boolean(assets.mantapTransparent));
     if (assets.linenTile) root.style.backgroundImage = `url("${assets.linenTile}")`;
   }
@@ -69,6 +70,7 @@
     });
     if (fonts.display) style.setProperty("--font-display", fonts.display);
     if (fonts.body) style.setProperty("--font-body", fonts.body);
+    if (fonts.names) style.setProperty("--font-names", fonts.names);
 
     // One timing definition: config → CSS custom properties.
     style.setProperty("--ribbon-ms", `${ms(motion.ribbonFall, 2000)}ms`);
@@ -285,6 +287,63 @@
     timer = setInterval(tick, 1000);
   }
 
+  /* ───────── Music (behaviour follows the save-the-date: loop, first tap starts it, toggle bottom-left) ───────── */
+
+  function initMusic() {
+    const audio = document.getElementById("music");
+    const toggle = document.getElementById("musicToggle");
+    if (!audio || !toggle) return;
+    const assets = config.assets || {};
+    const copy = config.copy || {};
+    if (assets.music === "") { toggle.hidden = true; return; }
+    if (assets.music && audio.getAttribute("src") !== assets.music) audio.src = assets.music;
+
+    let mutedByGuest = false; // once the guest turns music off, no later tap turns it back on
+    let resumeOnReturn = false;
+
+    const sync = () => {
+      const on = !audio.paused;
+      toggle.classList.toggle("is-on", on);
+      toggle.setAttribute("aria-pressed", String(on));
+      toggle.setAttribute("aria-label", on ? copy.musicOn || "Turn music off" : copy.musicOff || "Turn music on");
+    };
+    const play = () => {
+      const attempt = audio.play();
+      if (attempt && attempt.catch) attempt.catch(() => {}); // blocked until a user gesture
+    };
+
+    audio.addEventListener("play", sync);
+    audio.addEventListener("pause", sync);
+    audio.addEventListener("error", () => { toggle.hidden = true; });
+
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (audio.paused) { mutedByGuest = false; play(); }
+      else { mutedByGuest = true; audio.pause(); }
+    });
+
+    // The first tap anywhere (usually the bow) starts the music.
+    const onGesture = (event) => {
+      if (toggle.contains(event.target) || mutedByGuest || !audio.paused) return;
+      play();
+    };
+    ["pointerup", "touchend", "click", "keydown"].forEach((type) => window.addEventListener(type, onGesture, { passive: true }));
+
+    // Pause when the page is hidden or left; resume on return if it was playing.
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        resumeOnReturn = !audio.paused;
+        audio.pause();
+      } else if (resumeOnReturn && !mutedByGuest) {
+        play();
+      }
+    });
+    window.addEventListener("pagehide", () => audio.pause());
+
+    sync();
+    play(); // try immediately; most browsers wait for the first tap
+  }
+
   /* ───────── Events (built from config.events) ───────── */
 
   function renderEvents() {
@@ -375,6 +434,11 @@
   setState("loading");
   initCountdown();
   renderEvents(); // before initReveals, so the new [data-reveal] items are observed
+  initMusic();
+
+  // Tapping the Ganapati opens the invitation too.
+  const ganapati = cover.querySelector(".ganapati");
+  if (ganapati) ganapati.addEventListener("click", () => startOpening());
 
   // Maps CTA: points at venue.campusMapUrl once it is filled in.
   const mapLink = document.getElementById("mapLink");
@@ -412,6 +476,10 @@
       requestAnimationFrame(() => document.querySelector(".setting").scrollIntoView());
     }
   }
+
+  // Scroll cue fades away once the guest starts scrolling.
+  const onScroll = () => root.classList.toggle("has-scrolled", window.scrollY > 40);
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   window.addEventListener("resize", () => {
     if (state === "opened") fitHeroText();

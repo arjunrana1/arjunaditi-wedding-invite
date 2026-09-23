@@ -305,13 +305,13 @@ main {
   margin: 0 auto;
 }
 
-/* The frame is drawn 15% wider than the screen so the embroidery runs edge to edge. */
+/* Names frame: sized so the whole embroidered border is visible. */
 .hero { overflow: hidden; }
 
 .hero__frame {
   position: relative;
-  width: 115%;
-  margin-left: -7.5%; /* centred; the outer vines spill past the screen edges */
+  width: 106%; /* the embroidery's outer edges just overflow the screen */
+  margin-left: -3%;
   aspect-ratio: 908 / 1733;
   container-type: inline-size;
 }
@@ -862,12 +862,158 @@ main {
 .ending { padding: var(--gap) 0 0; }
 .ending__frame { margin-bottom: calc(-6% + 10px); }
 
-/* Mantap: 20% wider than the screen, centred; the planting spills off both sides. */
 .setting { overflow: hidden; }
-.setting__scene { width: 120%; margin-left: -10%; }
 
 /* Event date and time: near-black for legibility. */
 .event__when { color: #1c1c1a; }
+
+/* ───────── Ganapati on the cover ─────────
+   Sits just above the knot, floats 10 px up and down (3 s each way) while waiting,
+   then rises and fades over the same time the ribbon takes to fall. */
+.ganapati {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: calc(var(--stage-h) - var(--band-top) - var(--band-h) / 2 + var(--knot-h) / 2 + 6px);
+  width: min(calc(var(--cw) * .4), 180px);
+  transform: translate3d(-50%, 0, 0);
+  opacity: .96;
+  transition:
+    transform var(--ribbon-ms) var(--ease-soft),
+    opacity var(--ribbon-ms) ease;
+}
+.ganapati__img {
+  width: 100%;
+  height: auto;
+  animation: ganapati-float 3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 6px rgba(80, 60, 25, .15));
+}
+.cover.is-opening .ganapati {
+  transform: translate3d(-50%, -80px, 0);
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes ganapati-float {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -10px, 0); }
+}
+
+/* ───────── Scroll cue (bottom of the first screen) ───────── */
+.hero { position: relative; }
+.hero__scroll {
+  position: relative;
+  margin-top: 8px; /* sits just under the names frame, above the countdown */
+  text-align: center;
+  pointer-events: none;
+  --line: 1; /* starts with the date, with a quicker fade so it reads straight away */
+  transition:
+    opacity 800ms ease calc(var(--names-delay-now, var(--names-delay)) + var(--line) * var(--names-step)),
+    transform 800ms var(--ease-soft) calc(var(--names-delay-now, var(--names-delay)) + var(--line) * var(--names-step));
+}
+.js.cover-active .cover:not(.is-opening) ~ main .hero__scroll {
+  opacity: 0;
+  transform: translate3d(0, var(--names-distance), 0);
+}
+.hero__scroll-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1c1c1a;
+  /* soft linen halo keeps it readable over the embroidery */
+  text-shadow: 0 0 6px rgba(245, 240, 229, .95), 0 0 14px rgba(245, 240, 229, .9);
+  transition: opacity .6s ease;
+}
+.has-scrolled .hero__scroll-inner { opacity: 0; }
+.hero__scroll-text {
+  font-family: var(--font-body);
+  font-size: var(--label-size);
+  font-weight: 500;
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  padding-left: var(--label-track);
+}
+.hero__scroll-arrow {
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 1;
+  animation: scroll-nudge 2s ease-in-out infinite;
+}
+@keyframes scroll-nudge {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 6px, 0); }
+}
+
+/* Couple's names: soft, rounded serif */
+.hero__name, .ending__names {
+  font-family: var(--font-names, "Fraunces", "Cormorant Garamond", Georgia, serif);
+  font-variation-settings: "SOFT" 100;
+  font-weight: 500;
+}
+.hero__name { letter-spacing: 0; }
+/* One font for the names and the "&", in both places; same mixed case too. */
+.hero__amp, .ending__names {
+  font-family: var(--font-names, "Fraunces", "Cormorant Garamond", Georgia, serif);
+  font-variation-settings: "SOFT" 100;
+  font-style: normal;
+}
+.hero__amp { font-weight: 500; }
+.ending__names { text-transform: none; letter-spacing: .01em; }
+
+/* Event map link: a slim pill, lighter than the main button */
+.event__map {
+  min-height: 32px;
+  margin-top: 12px;
+  padding: 0 14px 0 calc(14px + var(--label-track));
+  border-color: rgba(95, 122, 99, .55);
+}
+
+/* Event art: 15% larger, grown equally above and below; negative margins keep the block spacing. */
+.event__img { max-height: 265px; max-width: none; }
+.event__art { margin: -17.5px 0; display: flex; justify-content: center; }
+@media (max-width: 379px) {
+  .event__img { max-height: 238px; }
+  .event__art { margin: -15.5px 0; }
+}
+
+/* ───────── Music toggle (fixed, bottom-left, above the cover) ───────── */
+.music-toggle {
+  position: fixed;
+  z-index: 15;
+  left: 14px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--sage);
+  border-radius: 50%;
+  background: rgba(245, 240, 229, .92);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 50, 30, .12);
+}
+.music-toggle[hidden] { display: none; }
+.music-toggle__icon { width: 22px; height: 22px; fill: currentColor; }
+.music-toggle__icon .stroke { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.music-toggle__icon--on { display: none; }
+.music-toggle.is-on .music-toggle__icon--on { display: block; }
+.music-toggle.is-on .music-toggle__icon--off { display: none; }
+
+/* Mantap: wide enough that the stair-end greenery runs off the sides; the building stays on screen. */
+.setting__scene { width: 139%; margin-left: -19.5%; } /* the building (≈14.6–85.2% of the art) just fits the screen */
+
+@media (prefers-reduced-motion: reduce) {
+  .ganapati__img, .hero__scroll-arrow { animation: none !important; }
+  .ganapati, .hero__scroll { transition: none !important; }
+}
+
+/* Names frame at 106%: text scaled to sit comfortably inside the oval. */
+.hero__safe { left: 25%; right: 25%; }
+.hero__name { font-size: min(clamp(38px, 12vw, 54px), 13.5cqi); }
+.hero__amp { font-size: clamp(22px, 6.4vw, 30px); }
+.hero__opening { font-size: 16px; }
 
 /* Reveal: only when observers exist and motion is allowed (app.js adds .reveal-ready). */
 .reveal-ready [data-reveal] {

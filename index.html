@@ -17,8 +17,8 @@
   <link rel="preload" as="image" href="assets/art/names-frame-pastel.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap">
-  <link rel="stylesheet" href="styles.css?v=17">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Fraunces:opsz,wght,SOFT@9..144,500,100;9..144,600,100&family=Jost:wght@400;500&display=swap">
+  <link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
   <div class="cover" id="cover" aria-label="Invitation cover" role="dialog" aria-modal="true">
@@ -36,6 +36,10 @@
         <img class="seal__ribbon seal__ribbon--right" src="assets/art/ribbon-right.webp" width="1400" height="224" alt="" decoding="async">
         <img class="seal__knot" src="assets/art/ribbon-knot.webp" width="700" height="340" alt="" decoding="async">
       </div>
+    </div>
+    <!-- Ganapati: floats gently above the knot; rises and fades as the ribbon falls. -->
+    <div class="ganapati" aria-hidden="true">
+      <img class="ganapati__img" src="assets/art/ganapati.webp" width="480" height="469" alt="" decoding="async">
     </div>
     <button class="bow" id="bowButton" type="button" aria-label="Open invitation">
     </button>
@@ -61,6 +65,13 @@
         </div>
       </div>
       <div class="hero__after"></div>
+      <!-- Scroll cue: bottom of the first screen; appears with the date, fades once the guest scrolls. -->
+      <div class="hero__scroll" aria-hidden="true">
+        <div class="hero__scroll-inner">
+          <span class="hero__scroll-text" data-text="copy.scrollCue">Scroll down</span>
+          <span class="hero__scroll-arrow">&#x25BE;</span>
+        </div>
+      </div>
     </section>
 
     <section class="countdown" aria-labelledby="countdownHeading" hidden>
@@ -80,12 +91,12 @@
       <h2 class="setting__heading" data-reveal data-text="copy.whenWhereHeading">When &amp; Where</h2>
       <figure class="setting__scene">
         <div class="setting__motion" data-reveal>
-          <img class="setting__art" src="assets/vishalakshi-mantap-pastel.webp" width="1482" height="967"
+          <img class="setting__art" src="assets/art/mantap-stairs-v2.webp" width="1400" height="807"
              alt="Embroidered Vishalakshi Mantap with its dome, tiers and front stairway" data-alt="venue.landmarkAlt" decoding="async">
         </div>
       </figure>
       <h2 class="setting__centre" id="settingCentre" data-reveal data-text="venue.centreName">Art of Living International Centre</h2>
-      <p class="setting__note" data-reveal data-text="venue.explanatoryCopy">The vibrant, eco-friendly campus is a renowned spiritual hub famous for its iconic Vishalakshi Mantap, with visitors from around the world gathering here for various meditation retreats.</p>
+      <p class="setting__note" data-reveal data-text="venue.explanatoryCopy">A place of stillness and learning, the Centre draws seekers from across the world to practise yoga and breath-work. It is also home to a Gurukul that keeps ancient Vedic traditions alive, including the sacred Vedic Vivah.</p>
       <a class="setting__map" id="mapLink" href="#" target="_blank" rel="noopener" data-reveal data-text="copy.mapButton">View Location</a>
     </section>
 
@@ -106,7 +117,7 @@
         <div class="ending__text">
           <p class="ending__line" data-text="copy.closingLine">We cannot wait to celebrate with you</p>
           <p class="ending__names"><span data-text="couple.firstName">Aditi</span> <span data-text="couple.separator">&amp;</span> <span data-text="couple.secondName">Arjun</span></p>
-          <p class="ending__details" data-text="copy.closingDetails">Art of Living International Centre · 24th, 25th Nov 2026</p>
+          <p class="ending__details" data-text="copy.closingDetails">With the blessings of our parents</p>
         </div>
       </div>
     </section>
@@ -129,9 +140,16 @@
     </li>
   </template>
 
+  <!-- Background music: starts on the guest's first tap (browsers block sound before that). -->
+  <audio id="music" src="assets/music.m4a" loop preload="none" playsinline></audio>
+  <button class="music-toggle" id="musicToggle" type="button" aria-label="Turn music on" aria-pressed="false">
+    <svg class="music-toggle__icon music-toggle__icon--on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="stroke" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+    <svg class="music-toggle__icon music-toggle__icon--off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="stroke" d="M15.5 9.5l5 5M20.5 9.5l-5 5"/></svg>
+  </button>
+
   <button class="debug-replay" id="debugReplay" type="button" hidden>Replay cover</button>
 
-  <script src="invite.config.js?v=17"></script>
-  <script src="app.js?v=17"></script>
+  <script src="invite.config.js?v=27"></script>
+  <script src="app.js?v=27"></script>
 </body>
 </html>
