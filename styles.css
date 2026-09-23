@@ -1,0 +1,812 @@
+/* Stage 1 — embroidered cover → names → Vishalakshi Mantap.
+   Colours, fonts and timings are overridden from invite.config.js via custom properties. */
+
+:root {
+  --ivory: #F5F0E5;
+  --linen: #EDE3D2;
+  --ink: #29432D;
+  --body: #3F4A3C;
+  --sage: #5F7A63;
+  --gold: #9C7F3E;
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-body: Jost, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+
+  --ribbon-ms: 2000ms;
+  --ribbon-lag: 180ms;
+  --label-ms: 450ms;
+  --door-delay: 1300ms;
+  --door-ms: 2500ms;
+  --names-delay: 4050ms;
+  --names-ms: 1500ms;
+  --names-step: 1500ms;
+  --names-distance: 36px;
+  --reveal-ms: 1300ms;
+  --reveal-step: 140ms;
+  --reveal-distance: 24px;
+  --ease-fall: cubic-bezier(.45, 0, .8, .45); /* gentle start, gathering pace like a slipping ribbon */
+  --ease-door: cubic-bezier(.72, .02, .28, 1);
+  --ease-soft: cubic-bezier(.22, .8, .32, 1);
+
+  /* Phone-width canvas; larger windows show it centred. */
+  --cw: min(100vw, 480px);
+
+  /* Cover geometry: one image coordinate system shared by both doors and the seal.
+     The cover is 853 × 1844; the ribbon band is centred at 50.9% of its height. */
+  --cover-ratio: calc(853 / 1844);
+  --ribbon-y: .509;
+  --stage-h: 100vh;   /* panel height (covers the largest viewport) */
+  --centre-y: 50vh;   /* where the ribbon lines up (centre of the smallest viewport) */
+  --cover-w: max(var(--cw), calc(var(--stage-h) * var(--cover-ratio)));
+  --cover-h: calc(var(--cover-w) / var(--cover-ratio));
+  --cover-top: calc(var(--centre-y) - var(--cover-h) * var(--ribbon-y));
+  /* The ribbon band sits at y 862–1015 of the 1844-high cover. */
+  --band-top: calc(var(--cover-top) + var(--cover-h) * 862 / 1844);
+  --band-h: calc(var(--cover-h) * 153 / 1844);
+  /* Seal pieces, sized from the band so they keep the generated proportions:
+     ribbon-left/right ≈ 1654 × 254, ribbon-knot ≈ 812 × 394 (trimmed). */
+  --ribbon-w: calc(var(--band-h) * 1654 / 254);
+  --knot-h: calc(var(--band-h) * 1.5);
+  --knot-w: calc(var(--knot-h) * 812 / 394);
+  --seal-overlap: calc(var(--band-h) * .8); /* inner ribbon ends tuck under the knot */
+  /* Far enough to carry the pieces below the bottom of the screen. */
+  --fall-distance: calc(var(--stage-h) - var(--band-top) + var(--knot-h));
+}
+
+@supports (height: 100lvh) {
+  :root {
+    --stage-h: 100lvh;
+    --centre-y: 50svh;
+    --cover-w: max(var(--cw), calc((200lvh - 100svh) * var(--cover-ratio)));
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: var(--linen) url("assets/art/ivory-linen-tile.webp") repeat;
+  background-size: 256px 256px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.cover-active,
+html.cover-active body { overflow: hidden; }
+
+body {
+  margin: 0;
+  color: var(--body);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  background: transparent;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ───────── Cover ───────── */
+
+.cover { display: none; }
+
+.cover-active .cover {
+  display: block;
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: var(--cw);
+  height: var(--stage-h);
+  overflow: hidden;
+  background: transparent; /* the doors alone are opaque; the hero is rendered beneath */
+}
+
+.door {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--linen);
+  transition: transform var(--door-ms) var(--ease-door) var(--door-delay);
+}
+
+.door--left { left: 0; }
+.door--right { right: 0; }
+
+/* Both halves show the same full composition, offset so the seam lines up exactly. */
+.door__art {
+  position: absolute;
+  top: var(--cover-top);
+  width: var(--cover-w);
+  height: var(--cover-h);
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.door--left .door__art { left: calc(var(--cw) / 2 - var(--cover-w) / 2); }
+.door--right .door__art { left: calc(var(--cover-w) / -2); }
+
+/* The seal: left ribbon, and a group of right ribbon + knot. Inner ends meet under the knot.
+   Positions use left/top only; transforms belong to the falling pieces. */
+.seal {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: var(--band-top);
+  height: var(--band-h);
+  pointer-events: none;
+}
+
+.seal__left,
+.seal__group {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform var(--ribbon-ms) var(--ease-fall),
+    opacity calc(var(--ribbon-ms) * .3) ease calc(var(--ribbon-ms) * .7);
+}
+
+.seal__left { transform-origin: 30% 50%; transition-delay: var(--ribbon-lag), calc(var(--ribbon-lag) + var(--ribbon-ms) * .7); }
+.seal__group { z-index: 1; transform-origin: 55% 50%; }
+
+.seal__ribbon {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: var(--ribbon-w);
+  max-width: none;
+}
+.seal__ribbon--left { left: calc(50% + var(--seal-overlap) - var(--ribbon-w)); }
+.seal__ribbon--right { left: calc(50% - var(--seal-overlap)); }
+
+.seal__knot {
+  position: absolute;
+  left: calc(50% - var(--knot-w) / 2);
+  top: calc(50% - var(--knot-h) / 2);
+  width: var(--knot-w);
+  height: var(--knot-h);
+  max-width: none;
+  filter: drop-shadow(0 4px 6px rgba(80, 60, 25, .18));
+}
+
+/* Left ribbon slides off to the left; knot and right ribbon fall together to the right. */
+.cover.is-opening .seal__left {
+  transform: translate3d(calc(var(--cw) * -.45), var(--fall-distance), 0) rotate(-14deg);
+  opacity: 0;
+}
+.cover.is-opening .seal__group {
+  transform: translate3d(calc(var(--cw) * .45), var(--fall-distance), 0) rotate(12deg);
+  opacity: 0;
+}
+
+/* Soft seam shading that only appears as the doors part. */
+.door::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  opacity: 0;
+  transition: opacity 500ms ease var(--door-delay);
+}
+.door--left::after { right: 0; background: linear-gradient(90deg, transparent, rgba(80, 62, 30, .2)); }
+.door--right::after { left: 0; background: linear-gradient(270deg, transparent, rgba(80, 62, 30, .2)); }
+
+.cover.is-opening .door::after { opacity: 1; }
+.cover.is-opening .door--left { transform: translate3d(-104%, 0, 0); }
+.cover.is-opening .door--right { transform: translate3d(104%, 0, 0); }
+.cover.is-opening .door { will-change: transform; }
+
+.cover.is-opening,
+.cover.is-opening .door { pointer-events: none; }
+.cover.is-opening .skip { pointer-events: auto; }
+
+.no-transition *,
+.no-transition *::after { transition: none !important; }
+
+/* Hit target and label: an invisible native button over the knot; the art itself is in .seal. */
+.bow {
+  position: absolute;
+  z-index: 3;
+  left: calc(50% - var(--knot-w) / 2 - 16px);
+  top: calc(var(--band-top) + var(--band-h) / 2 - var(--knot-h) / 2 - 16px);
+  width: calc(var(--knot-w) + 32px);
+  padding: calc(var(--knot-h) + 32px) 0 16px;
+  margin: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bow:focus-visible { outline-offset: -2px; border-radius: 24px; }
+
+.bow__label {
+  display: block;
+  transition: opacity var(--label-ms) ease-out;
+}
+
+.bow__names,
+.bow__cue {
+  display: block;
+  text-align: center;
+  text-shadow: 0 0 6px var(--ivory), 0 0 2px var(--ivory);
+}
+
+.bow__names {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.bow__cue {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.cover.is-opening .bow__label { opacity: 0; }
+
+.cover.is-opening .bow { pointer-events: none; }
+
+.skip {
+  position: absolute;
+  z-index: 4;
+  right: 14px;
+  bottom: calc(100% - 100vh + 16px + env(safe-area-inset-bottom, 0px));
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(41, 67, 45, .35);
+  border-radius: 999px;
+  background: rgba(245, 240, 229, .92);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+  transition: opacity var(--label-ms) ease-out;
+}
+
+@supports (height: 100svh) {
+  .skip { bottom: calc(100% - 100svh + 16px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.cover.is-opening .skip { opacity: 0; }
+
+/* ───────── Names ───────── */
+
+main {
+  width: var(--cw);
+  margin: 0 auto;
+}
+
+.hero__frame {
+  position: relative;
+  aspect-ratio: 908 / 1733;
+  container-type: inline-size;
+}
+
+.hero__art {
+  width: 100%;
+  height: 100%;
+}
+
+/* Safe text rectangle inside the embroidered oval (names-frame-pastel: oval ≈ 23–78% × 26–74%). */
+.hero__safe {
+  position: absolute;
+  left: 27%;
+  right: 27%;
+  top: 27.5%; /* the oval's widest point sits at ~47% of the frame height */
+  bottom: 31%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Geometry belongs to .hero__safe; only the text lines themselves move. */
+.hero__text { width: 100%; }
+
+/* Each line floats up and settles, one after another, as the doors part. */
+.hero__opening, .hero__names, .hero__date, .hero__place {
+  transition:
+    opacity var(--names-ms) ease calc(var(--names-delay-now, var(--names-delay)) + var(--line, 0) * var(--names-step)),
+    transform var(--names-ms) var(--ease-soft) calc(var(--names-delay-now, var(--names-delay)) + var(--line, 0) * var(--names-step)),
+    filter var(--names-ms) ease calc(var(--names-delay-now, var(--names-delay)) + var(--line, 0) * var(--names-step));
+}
+/* Skip / instant open: no waiting for doors that are not animating. */
+.instant-open { --names-delay-now: 0ms; }
+/* Names first, then the date, then the rest. */
+.hero__names { --line: 0; }
+.hero__date { --line: 1; }
+.hero__opening, .hero__place { --line: 2; }
+
+.js.cover-active .cover:not(.is-opening) ~ main :is(.hero__opening, .hero__names, .hero__date, .hero__place) {
+  opacity: 0;
+  transform: translate3d(0, var(--names-distance), 0);
+  filter: blur(6px); /* soft and faded until it gains colour and weight */
+}
+/* The rest of the text simply fades in, without the rise. */
+.js.cover-active .cover:not(.is-opening) ~ main :is(.hero__opening, .hero__place) {
+  transform: none;
+  filter: none;
+}
+
+.hero__opening {
+  margin: 0 auto 10px;
+  max-width: 9.6em;
+  text-wrap: balance;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--body);
+}
+
+.hero__names {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  outline: none;
+}
+
+.hero__name {
+  display: block;
+  font-size: clamp(42px, 14vw, 62px);
+  font-size: min(clamp(40px, 13vw, 58px), 14.5cqi); /* never wider than the oval, even with enlarged text */
+  letter-spacing: .01em;
+}
+
+.hero__amp {
+  display: block;
+  margin: 2px 0 4px;
+  font-size: clamp(24px, 7vw, 32px);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero__meta {
+  margin: 12px 0 0;
+  line-height: 1.45;
+}
+
+.hero__date,
+.hero__place { display: block; }
+
+.hero__date {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.hero__place {
+  max-width: 10em;
+  margin: 4px auto 0;
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--sage);
+}
+
+/* Large text or long copy: app.js moves the opening line and date/place below the frame. */
+.hero__after:empty { display: none; }
+.hero__after {
+  padding: 20px 24px 0;
+  text-align: center;
+}
+.hero__after .hero__opening { max-width: 22em; }
+
+/* ───────── Countdown ───────── */
+
+.countdown {
+  padding: 36px 20px 8px;
+  text-align: center;
+}
+.countdown[hidden] { display: none; }
+
+.countdown__rule {
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 0 auto;
+  background: var(--gold);
+  opacity: .55;
+}
+.countdown__rule:last-child { margin-top: 36px; }
+
+.countdown__heading {
+  margin: 28px 0 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.countdown__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 380px;
+  margin: 0 auto;
+  --i: 1;
+}
+
+.countdown__grid[hidden] { display: none; }
+
+.countdown__unit { display: flex; flex-direction: column; align-items: center; }
+
+.countdown__num {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 11vw, 48px);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ink);
+}
+
+.countdown__label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.countdown__done {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 26px;
+  color: var(--ink);
+}
+
+/* ───────── Setting ───────── */
+
+.setting {
+  padding: 24px 0 72px;
+  text-align: center;
+  /* Warm the shared linen tile toward the Mantap scene's fabric (sampled ≈ rgb 230 211 189),
+     so the scene sits in the same cloth rather than on a rectangle. */
+  background: linear-gradient(180deg, rgba(215, 190, 160, 0) 0, rgba(215, 190, 160, .28) 30%);
+}
+
+.setting__scene { margin: 0; }
+
+/* Transparent Mantap artwork sits directly on the page linen: no tint, no feathering. */
+.setting--transparent-art { background: none; }
+.setting--transparent-art .setting__art { -webkit-mask-image: none; mask-image: none; }
+
+.setting__art {
+  width: 100%;
+  height: auto;
+  /* Feather only the empty linen margins: generous at the top, slight at sides and base. */
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 0, #000 22%, #000 95%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 1.2%, #000 98.8%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(180deg, transparent 0, #000 22%, #000 95%, transparent 100%),
+    linear-gradient(90deg, transparent 0, #000 1.2%, #000 98.8%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.setting__caption {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--sage);
+  --i: 1;
+}
+
+.setting__heading {
+  margin: 0 24px 28px;
+  padding-top: 48px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(26px, 7vw, 32px);
+  color: var(--sage);
+}
+
+.setting__centre {
+  margin: 22px 24px 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 8vw, 36px);
+  line-height: 1.15;
+  color: var(--ink);
+  --i: 2;
+}
+
+.setting__note {
+  margin: 14px auto 0;
+  padding: 0 24px;
+  max-width: 30em;
+  font-size: 16px;
+  line-height: 1.65;
+  --i: 3;
+}
+
+.setting__map {
+  display: inline-block;
+  margin: 24px auto 0;
+  padding: 12px 28px;
+  border: 1px solid var(--sage);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--ink);
+  text-decoration: none;
+  --i: 4;
+}
+.setting__map:hover, .setting__map:focus-visible { background: rgba(255, 255, 255, .35); }
+
+/* ───────── Events (rendered from config.events) ─────────
+   Transparent embroidery sits straight on the shared linen: no panels, borders or tints. */
+
+.events[hidden] { display: none; }
+
+.events { padding: 4px 0 24px; }
+
+.events__heading {
+  margin: 0 24px 4px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(26px, 7vw, 32px);
+  color: var(--sage);
+}
+
+.events__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Illustration left, details right. Art is capped at a modest height so each event stays compact;
+   it always keeps its own aspect ratio. */
+.event {
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  align-items: center;
+  column-gap: 16px;
+  padding: 6px 22px 6px 14px;
+}
+
+/* Gold cursive flourish between events (not above the first). */
+.event__divider {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(150px, 42%);
+  height: auto;
+  margin: 6px 0 14px;
+  /* The flourish is cropped from the RSVP art; fade its cut ends into the linen. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+}
+.event:first-child .event__divider { display: none; }
+
+.event__art { width: 100%; }
+
+.event__img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 200px;
+  margin: 0 auto;
+}
+
+.event__body { min-width: 0; }
+
+.event__date, .event__time { display: block; }
+
+.event__when {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.event__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(25px, 6.8vw, 31px);
+  line-height: 1.08;
+  color: var(--ink);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.event__subtitle {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.25;
+  color: var(--sage);
+}
+
+.event__venue {
+  margin: 8px 0 0;
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: var(--body);
+}
+
+.event__attire {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--sage);
+}
+.event__attire-label {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.event__map {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 18px;
+  border: 1px solid var(--sage);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.event__map:hover, .event__map:focus-visible { background: rgba(255, 255, 255, .35); }
+
+/* Narrow phones (and enlarged text): stack art above centred details instead of shrinking either. */
+@media (max-width: 379px) {
+  .event {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+    padding: 6px 24px;
+    text-align: center;
+  }
+  .event__img { max-height: 180px; }
+}
+
+/* ───────── RSVP ───────── */
+
+.rsvp {
+  padding: 32px 12px 8px;
+  text-align: center;
+}
+.rsvp__art { width: 100%; height: auto; }
+.rsvp__note {
+  margin: 4px 24px 0;
+  font-size: 16px;
+}
+.rsvp__note[hidden] { display: none; }
+
+/* ───────── Closing ─────────
+   Live text sits inside the frame's open centre (≈ 22–78% × 16–76% of the artwork). */
+
+.ending { padding: 40px 0 56px; }
+
+.ending__frame {
+  position: relative;
+  container-type: inline-size;
+}
+.ending__art { width: 100%; height: auto; }
+
+.ending__text {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  top: 20%;
+  bottom: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6cqi;
+  text-align: center;
+}
+.ending__text p { margin: 0; }
+
+.ending__line {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: max(16px, 4.6cqi);
+  line-height: 1.1;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ending__names {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: max(19px, 5.6cqi);
+  letter-spacing: .06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.ending__details {
+  font-size: max(9px, 2.4cqi);
+  font-weight: 500;
+  letter-spacing: .1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--body);
+  text-wrap: balance;
+}
+
+/* Reveal: only when observers exist and motion is allowed (app.js adds .reveal-ready). */
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-distance), 0);
+  transition:
+    opacity var(--reveal-ms) ease,
+    transform var(--reveal-ms) var(--ease-soft);
+  transition-delay: calc(var(--i, 0) * var(--reveal-step));
+}
+
+.reveal-ready [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ───────── Debug ───────── */
+
+.debug-replay {
+  position: fixed;
+  z-index: 20;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border: 1px dashed var(--sage);
+  border-radius: 6px;
+  background: var(--ivory);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door, .door::after, .seal__left, .seal__group, .bow__label, .skip,
+  .hero__opening, .hero__names, .hero__date, .hero__place,
+  .reveal-ready [data-reveal] { transition: none !important; }
+}
