@@ -37,7 +37,7 @@ window.invitationConfig = {
     eventMapButton: "View Location",
     dressCodeLabel: "Dress code",
     closingLine: "We cannot wait to celebrate with you",
-    closingDetails: "With the blessings of our parents",
+    closingDetails: "With warm invitations from Rana and Gupta families",
     scrollCue: "Scroll down",
     musicOn: "Turn music off", // accessible names for the music button
     musicOff: "Turn music on",
@@ -60,7 +60,7 @@ window.invitationConfig = {
     campusMapUrl: "https://maps.app.goo.gl/HfzEFNVEVz69Ac9v7", // Vishalakshi Mantap
     // Stage 1 has no event sections yet, so this says "each event" rather than "each event below".
     explanatoryCopy:
-      "A place of stillness and learning, the Centre draws seekers from across the world to practise yoga and breath-work. It is also home to a Gurukul that keeps ancient Vedic traditions alive, including the sacred Vedic Vivah.",
+      "The place where we found ourselves and each other. With paths that we’ve walked together in silence, in joy, in love. We warmly invite you to become a part of this magical place we call home, with the hope that you find some of that magic for yourself like countless others like us.",
   },
 
   // Confirmed schedule. Each entry renders one event section (title, date/time, venue, dress code, map link).
@@ -104,13 +104,13 @@ window.invitationConfig = {
       day: 25,
       month: 11,
       startTime: "09:30",
-      title: "Wedding Ceremony",
+      title: "Vedic Vivah",
       subtitle: "",
       description: "Join us as we begin our married life together, surrounded by your love and blessings.",
       venue: "Radha Kunj Mantap",
       mapUrl: "https://maps.app.goo.gl/g1T1XfCXn8VHuxcW7",
       attire: "Royal traditionals",
-      programmeLabel: "Wedding Ceremony",
+      programmeLabel: "Vedic Vivah",
       palette: "wedding",
       image: "assets/art/event-wedding-lakeside.webp",
       alt: "Embroidered lakeside mandap with draped canopy, sacred fire and lotuses on the water",
