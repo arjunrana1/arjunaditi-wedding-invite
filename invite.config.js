@@ -60,7 +60,7 @@ window.invitationConfig = {
     campusMapUrl: "https://maps.app.goo.gl/HfzEFNVEVz69Ac9v7", // Vishalakshi Mantap
     // Stage 1 has no event sections yet, so this says "each event" rather than "each event below".
     explanatoryCopy:
-      "The place where we found ourselves and each other. With paths that we’ve walked together in silence, in joy, in love. We warmly invite you to become a part of this magical place we call home, with the hope that you find some of that magic for yourself like countless others like us.",
+      "This is the place where we found ourselves, and each other, on paths we have walked together in silence, in joy and in love. We warmly invite you to become a part of this magical place we call home, and we hope you find some of its magic for yourself, as countless others have, and as we did.",
   },
 
   // Confirmed schedule. Each entry renders one event section (title, date/time, venue, dress code, map link).
