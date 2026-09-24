@@ -902,7 +902,7 @@ main {
 .hero { position: relative; }
 .hero__scroll {
   position: relative;
-  margin-top: 8px; /* sits just under the names frame, above the countdown */
+  margin-top: 22px; /* inside the oval, a clear breath below the date */
   text-align: center;
   pointer-events: none;
   --line: 1; /* starts with the date, with a quicker fade so it reads straight away */

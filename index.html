@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Fraunces:opsz,wght,SOFT@9..144,500,100;9..144,600,100&family=Jost:wght@400;500&display=swap">
-  <link rel="stylesheet" href="styles.css?v=30">
+  <link rel="stylesheet" href="styles.css?v=31">
 </head>
 <body>
   <div class="cover" id="cover" aria-label="Invitation cover" role="dialog" aria-modal="true">
@@ -58,20 +58,20 @@
               <span class="hero__amp" data-text="couple.separator">&amp;</span>
               <span class="hero__name" data-text="couple.secondName">Arjun</span>
             </h1>
-            <p class="hero__meta">
+            <div class="hero__meta">
               <span class="hero__date" data-text="dates.dateRangeDisplay">24th, 25th Nov 2026</span>
-            </p>
+              <!-- Scroll cue: inside the oval under the date; appears with the date, fades once the guest scrolls. -->
+              <div class="hero__scroll" aria-hidden="true">
+                <div class="hero__scroll-inner">
+                  <span class="hero__scroll-text" data-text="copy.scrollCue">Scroll down</span>
+                  <span class="hero__scroll-arrow">&#x25BE;</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div class="hero__after"></div>
-      <!-- Scroll cue: bottom of the first screen; appears with the date, fades once the guest scrolls. -->
-      <div class="hero__scroll" aria-hidden="true">
-        <div class="hero__scroll-inner">
-          <span class="hero__scroll-text" data-text="copy.scrollCue">Scroll down</span>
-          <span class="hero__scroll-arrow">&#x25BE;</span>
-        </div>
-      </div>
     </section>
 
     <section class="countdown" aria-labelledby="countdownHeading" hidden>
@@ -149,7 +149,7 @@
 
   <button class="debug-replay" id="debugReplay" type="button" hidden>Replay cover</button>
 
-  <script src="invite.config.js?v=30"></script>
-  <script src="app.js?v=30"></script>
+  <script src="invite.config.js?v=31"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>
